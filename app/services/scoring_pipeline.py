@@ -9,8 +9,11 @@ from app.core.config import MODEL_VERSION
 
 
 def process_single_business(raw: dict, use_ai=True):
+    business_id = raw.get("business_id","UNKNOWN")
     features = engineer_features(raw)
     score = calculate_score(features)
+
+    score = max(0, min(100,score))
 
     # risk band
     if score <= 35:
@@ -20,7 +23,11 @@ def process_single_business(raw: dict, use_ai=True):
     else:
         band = "High"
 
-    factors = get_top_factors(features, weights)
+    try:
+        factors = get_top_factors(features, weights)
+    except Exception:
+        factors = []
+
     if use_ai:
         ai_text = generate_ai_analysis(score, band, factors)
     else:
@@ -36,7 +43,7 @@ def process_single_business(raw: dict, use_ai=True):
         action = "Reject"
 
     return {
-        "business_id": raw["business_id"],
+        "business_id": business_id,
         "risk_score": score,
         "risk_band": band,
         "confidence": confidence,
