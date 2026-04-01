@@ -1,0 +1,15 @@
+Stages.txt
+Theory.md
+Plan.txt
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.vscode
+.pytest_cache/
+models/
+.ipynb_checkpoints/
+.env
+venv/
+.env.*
+FeatureEngineering.txt

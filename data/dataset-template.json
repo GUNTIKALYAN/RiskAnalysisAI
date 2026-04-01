@@ -1,0 +1,240 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Sample business dataset for risk scoring AI engineer hiring test",
+    "total_records": 250,
+    "date_generated": "2026-03-30",
+    "field_definitions": {
+      "business_id": "Unique business identifier (string, alphanumeric + hyphens)",
+      "gst_filing_delay_days_avg": "Average days late for GST/tax filings over 12 months (number, 0-365, or null if no data)",
+      "num_payment_defaults_12m": "Count of payment defaults in last 12 months (number, 0+, or null)",
+      "total_overdue_amount_usd": "Total outstanding dues in USD (number, 0+, or null)",
+      "blocklist_flag": "Is business on any regulatory/compliance blocklist? (boolean, true/false)",
+      "legal_notice_count_12m": "Count of legal notices (statutory, civil, tax) in last 12 months (number, 0+, or null)",
+      "return_bounce_rate": "Cheque return rate – fraction of cheques that bounced (number, 0-1, or null)",
+      "business_age_months": "Months since business registration/incorporation (number, 0+, or null)",
+      "annual_turnover_band": "Revenue category (string: '<1M', '1M-10M', '10M-100M', '>100M', or null)",
+      "profile_completeness_score": "Percentage (0-1) of optional profile fields supplied (number, 0-1, or null)",
+      "geography_risk_index": "Geographic/regional risk score (0=low, 1=high) (number, 0-1, or null)",
+      "sector_risk_index": "Industry/sector inherent risk (0=low, 1=high) (number, 0-1, or null)"
+    }
+  },
+  "notes": [
+    "This is SAMPLE DATA only. Real dataset will be provided separately.",
+    "Some fields are intentionally null to test candidate's data handling.",
+    "Candidate must load this, clean it, engineer features, and train/score.",
+    "Risk band assignment is candidate's responsibility (see API contract for thresholds).",
+    "Use this to validate your data loader and API before receiving full dataset."
+  ],
+  "sample_records": [
+    {
+      "business_id": "BUS-00001",
+      "gst_filing_delay_days_avg": 2.5,
+      "num_payment_defaults_12m": 0,
+      "total_overdue_amount_usd": 0,
+      "blocklist_flag": false,
+      "legal_notice_count_12m": 0,
+      "return_bounce_rate": 0.0,
+      "business_age_months": 120,
+      "annual_turnover_band": "10M-100M",
+      "profile_completeness_score": 0.95,
+      "geography_risk_index": 0.2,
+      "sector_risk_index": 0.35
+    },
+    {
+      "business_id": "BUS-00002",
+      "gst_filing_delay_days_avg": null,
+      "num_payment_defaults_12m": 3,
+      "total_overdue_amount_usd": 25000,
+      "blocklist_flag": true,
+      "legal_notice_count_12m": 2,
+      "return_bounce_rate": 0.25,
+      "business_age_months": 14,
+      "annual_turnover_band": "1M-10M",
+      "profile_completeness_score": 0.55,
+      "geography_risk_index": 0.7,
+      "sector_risk_index": 0.8
+    },
+    {
+      "business_id": "BUS-00003",
+      "gst_filing_delay_days_avg": 8.0,
+      "num_payment_defaults_12m": 1,
+      "total_overdue_amount_usd": 3500,
+      "blocklist_flag": false,
+      "legal_notice_count_12m": 0,
+      "return_bounce_rate": 0.05,
+      "business_age_months": 72,
+      "annual_turnover_band": "10M-100M",
+      "profile_completeness_score": 0.88,
+      "geography_risk_index": 0.3,
+      "sector_risk_index": 0.45
+    },
+    {
+      "business_id": "BUS-00004",
+      "gst_filing_delay_days_avg": 45.0,
+      "num_payment_defaults_12m": null,
+      "total_overdue_amount_usd": null,
+      "blocklist_flag": false,
+      "legal_notice_count_12m": 1,
+      "return_bounce_rate": null,
+      "business_age_months": 11,
+      "annual_turnover_band": "<1M",
+      "profile_completeness_score": 0.42,
+      "geography_risk_index": 0.5,
+      "sector_risk_index": 0.6
+    },
+    {
+      "business_id": "BUS-00005",
+      "gst_filing_delay_days_avg": 1.0,
+      "num_payment_defaults_12m": 0,
+      "total_overdue_amount_usd": 0,
+      "blocklist_flag": false,
+      "legal_notice_count_12m": 0,
+      "return_bounce_rate": 0.0,
+      "business_age_months": 180,
+      "annual_turnover_band": ">100M",
+      "profile_completeness_score": 1.0,
+      "geography_risk_index": 0.1,
+      "sector_risk_index": 0.2
+    },
+    {
+      "business_id": "BUS-00006",
+      "gst_filing_delay_days_avg": 22.0,
+      "num_payment_defaults_12m": 2,
+      "total_overdue_amount_usd": 8900,
+      "blocklist_flag": false,
+      "legal_notice_count_12m": 0,
+      "return_bounce_rate": 0.12,
+      "business_age_months": 36,
+      "annual_turnover_band": "1M-10M",
+      "profile_completeness_score": 0.7,
+      "geography_risk_index": 0.4,
+      "sector_risk_index": 0.55
+    },
+    {
+      "business_id": "BUS-00007",
+      "gst_filing_delay_days_avg": null,
+      "num_payment_defaults_12m": 5,
+      "total_overdue_amount_usd": 65000,
+      "blocklist_flag": true,
+      "legal_notice_count_12m": 3,
+      "return_bounce_rate": 0.4,
+      "business_age_months": 8,
+      "annual_turnover_band": "1M-10M",
+      "profile_completeness_score": 0.3,
+      "geography_risk_index": 0.8,
+      "sector_risk_index": 0.75
+    },
+    {
+      "business_id": "BUS-00008",
+      "gst_filing_delay_days_avg": 3.5,
+      "num_payment_defaults_12m": 0,
+      "total_overdue_amount_usd": 0,
+      "blocklist_flag": false,
+      "legal_notice_count_12m": 0,
+      "return_bounce_rate": 0.02,
+      "business_age_months": 96,
+      "annual_turnover_band": "10M-100M",
+      "profile_completeness_score": 0.92,
+      "geography_risk_index": 0.25,
+      "sector_risk_index": 0.3
+    },
+    {
+      "business_id": "BUS-00009",
+      "gst_filing_delay_days_avg": 60.0,
+      "num_payment_defaults_12m": null,
+      "total_overdue_amount_usd": 15000,
+      "blocklist_flag": true,
+      "legal_notice_count_12m": 1,
+      "return_bounce_rate": null,
+      "business_age_months": 9,
+      "annual_turnover_band": "<1M",
+      "profile_completeness_score": 0.5,
+      "geography_risk_index": 0.6,
+      "sector_risk_index": 0.5
+    },
+    {
+      "business_id": "BUS-00010",
+      "gst_filing_delay_days_avg": 5.0,
+      "num_payment_defaults_12m": 0,
+      "total_overdue_amount_usd": 0,
+      "blocklist_flag": false,
+      "legal_notice_count_12m": 0,
+      "return_bounce_rate": 0.0,
+      "business_age_months": 144,
+      "annual_turnover_band": ">100M",
+      "profile_completeness_score": 0.99,
+      "geography_risk_index": 0.15,
+      "sector_risk_index": 0.25
+    }
+  ],
+  "data_characteristics": {
+    "description": "Key patterns in the full dataset (250 records) that candidates should be aware of:",
+    "missing_data": {
+      "description": "Some fields are intentionally sparse to test real-world handling",
+      "gst_filing_delay_days_avg": "~15% missing",
+      "num_payment_defaults_12m": "~8% missing",
+      "total_overdue_amount_usd": "~8% missing",
+      "return_bounce_rate": "~20% missing",
+      "business_age_months": "~3% missing",
+      "annual_turnover_band": "~12% missing",
+      "profile_completeness_score": "~5% missing",
+      "geography_risk_index": "~10% missing",
+      "sector_risk_index": "~10% missing"
+    },
+    "value_ranges": {
+      "gst_filing_delay_days_avg": "0 to 120 days",
+      "num_payment_defaults_12m": "0 to 8",
+      "total_overdue_amount_usd": "$0 to $250,000",
+      "return_bounce_rate": "0.0 to 0.5",
+      "business_age_months": "5 to 240 months",
+      "profile_completeness_score": "0.2 to 1.0"
+    },
+    "class_balance": {
+      "blocklist_flag_true": "~12% of businesses",
+      "blocklist_flag_false": "~88% of businesses"
+    },
+    "outliers": "Some records have extreme values (e.g., 8 defaults, $250K overdue). Candidates should be aware and document handling."
+  },
+  "usage_instructions": {
+    "step_1": "Download this file (dataset-template.json)",
+    "step_2": "Parse the JSON into your data loader",
+    "step_3": "Check for schema compliance and missing data",
+    "step_4": "Engineer features (create new derived signals if helpful)",
+    "step_5": "Train or define your risk model",
+    "step_6": "Score each record and output risk_score + risk_band + top_factors + ai_analysis",
+    "step_7": "Validate against API contract (API-CONTRACT.md)",
+    "step_8": "Write tests and document assumptions",
+    "step_9": "Submit code + README + model card + sample outputs"
+  },
+  "expected_output_format": {
+    "note": "After scoring all 250 records, candidates should generate output like this for each business:",
+    "example": {
+      "business_id": "BUS-00001",
+      "risk_score": 28,
+      "risk_band": "Low",
+      "confidence": 0.91,
+      "top_factors": [
+        {
+          "factor": "Long business history (120 months) and track record",
+          "contribution": 0.40,
+          "direction": "positive"
+        },
+        {
+          "factor": "Consistent on-time tax filings (2.5 days avg delay)",
+          "contribution": 0.30,
+          "direction": "positive"
+        },
+        {
+          "factor": "Strong turnover band ($10M-$100M annual)",
+          "contribution": 0.25,
+          "direction": "positive"
+        }
+      ],
+      "ai_risk_analysis": "This business presents low risk. It has a strong 10-year track record with large annual revenues ($10M-$100M) and excellent compliance history (minimal filing delays, no defaults, no legal notices). The organization is not on any blocklist and maintains high profile completeness (95%). Geographic and sector risks are moderate but well-managed by the company's maturity and scale. Recommend approval with standard KYC verification.",
+      "recommended_action": "Approve",
+      "timestamp": "2026-03-30T15:00:00Z",
+      "model_version": "1.0.0"
+    }
+  }
+}
