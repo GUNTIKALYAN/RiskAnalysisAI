@@ -1,7 +1,7 @@
 {
   "metadata": {
     "version": "1.0.0",
-    "description": "Sample business dataset for risk scoring AI engineer hiring test",
+    "description": "Sample business dataset for risk scoring",
     "total_records": 250,
     "date_generated": "2026-03-30",
     "field_definitions": {
@@ -22,11 +22,10 @@
   "notes": [
     "This is SAMPLE DATA only. Real dataset will be provided separately.",
     "Some fields are intentionally null to test candidate's data handling.",
-    "Candidate must load this, clean it, engineer features, and train/score.",
-    "Risk band assignment is candidate's responsibility (see API contract for thresholds).",
+    "Must load this, clean it, engineer features, and train/score.",
     "Use this to validate your data loader and API before receiving full dataset."
   ],
-  "sample_records": [
+  "records": [
     {
       "business_id": "BUS-00001",
       "gst_filing_delay_days_avg": 2.5,

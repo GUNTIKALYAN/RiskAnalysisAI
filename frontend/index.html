@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Business Risk Intelligence</title>
+  <!--
+    FastAPI main.py mounts the frontend folder at /static
+      app.mount("/static", StaticFiles(directory=FRONTEND_PATH), name="static")
+    So all assets must be referenced as /static/<filename>
+  -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="6" fill="#2563EB"/>
+        <path d="M7 14L11 18L21 8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <span class="logo-title">BRI</span>
+      <span class="logo-sub">Risk Intelligence</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">ANALYSIS</div>
+    <a href="#" class="nav-item active" data-page="score" onclick="return showPage('score', this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Score Business
+    </a>
+    <a href="#" class="nav-item" data-page="batch" onclick="return showPage('batch', this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Batch Scoring
+    </a>
+    <a href="#" class="nav-item" data-page="results" onclick="return showPage('results', this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Results
+    </a>
+
+    <div class="nav-section-label" style="margin-top:24px">SYSTEM</div>
+    <a href="#" class="nav-item" onclick="checkHealth(); return false;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Health Check
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="health-pill" id="healthPill">
+      <span class="health-dot" id="healthDot"></span>
+      <span id="healthText">Checking...</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main-wrapper" id="mainWrapper">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="breadcrumb">
+        <span class="breadcrumb-root">BRI</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <span id="breadcrumbCurrent">Score Business</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="api-status-badge" id="apiBadge">
+        <span class="status-dot" id="apiStatusDot"></span>
+        <span id="apiStatusText">Checking...</span>
+      </div>
+      <div class="topbar-version" id="modelVersion">v—</div>
+    </div>
+  </header>
+
+  <!-- ==================== PAGE: SCORE ==================== -->
+  <main class="page-content" id="page-score">
+    <div class="page-header">
+      <h1 class="page-title">Score Business</h1>
+      <p class="page-subtitle">
+        Submit a business profile to <code class="inline-code">POST /api/v1/score</code>
+        and receive an AI-driven risk assessment.
+      </p>
+    </div>
+
+    <div class="score-layout">
+
+      <!-- FORM PANEL -->
+      <div class="form-panel card">
+        <div class="card-header">
+          <h2 class="card-title">Business Profile</h2>
+          <button class="btn-ghost" onclick="fillSampleData()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Fill Sample
+          </button>
+        </div>
+
+        <form id="scoreForm" onsubmit="submitScore(event)">
+
+          <div class="form-row">
+            <div class="form-group full">
+              <label class="form-label">
+                Business ID <span class="required">*</span>
+                <span class="field-hint">3–50 alphanumeric chars or hyphens</span>
+              </label>
+              <input type="text" class="form-input" id="business_id"
+                placeholder="e.g. BUS-00123"
+                pattern="[A-Za-z0-9\-]{3,50}"
+                title="3–50 characters: letters, numbers, hyphens only"
+                required />
+            </div>
+          </div>
+
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Financial Indicators
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">GST Filing Delay (days avg)
+                <span class="field-hint">0 – 365, null OK</span>
+              </label>
+              <input type="number" class="form-input" id="gst_filing_delay_days_avg"
+                placeholder="0 – 365" min="0" max="365" step="0.1"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Defaults (12m)
+                <span class="field-hint">null OK</span>
+              </label>
+              <input type="number" class="form-input" id="num_payment_defaults_12m"
+                placeholder="Count" min="0" step="1"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Total Overdue Amount (USD)
+                <span class="field-hint">null OK</span>
+              </label>
+              <input type="number" class="form-input" id="total_overdue_amount_usd"
+                placeholder="0.00" min="0" step="0.01"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Return / Bounce Rate
+                <span class="field-hint">0 = none · 1 = all returned</span>
+              </label>
+              <input type="number" class="form-input" id="return_bounce_rate"
+                placeholder="0.00 – 1.00" min="0" max="1" step="0.01"/>
+            </div>
+          </div>
+
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Legal &amp; Compliance
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Legal Notices (12m)
+                <span class="field-hint">null OK</span>
+              </label>
+              <input type="number" class="form-input" id="legal_notice_count_12m"
+                placeholder="Count" min="0" step="1"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Blocklist Flag
+                <span class="field-hint">required boolean</span>
+              </label>
+              <select class="form-input" id="blocklist_flag">
+                <option value="false">No — Not on blocklist</option>
+                <option value="true">Yes — On regulatory blocklist</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Business Profile
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Business Age (months)
+                <span class="field-hint">since registration</span>
+              </label>
+              <input type="number" class="form-input" id="business_age_months"
+                placeholder="Months" min="0" step="1"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Annual Turnover Band</label>
+              <select class="form-input" id="annual_turnover_band">
+                <option value="">— Select —</option>
+                <option value="<1M">&lt; 1M</option>
+                <option value="1M-10M">1M – 10M</option>
+                <option value="10M-100M">10M – 100M</option>
+                <option value=">100M">&gt; 100M</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Risk Indices
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Geography Risk Index
+                <span class="field-hint">0 = low · 1 = high</span>
+              </label>
+              <input type="number" class="form-input" id="geography_risk_index"
+                placeholder="0.00 – 1.00" min="0" max="1" step="0.01"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sector Risk Index
+                <span class="field-hint">0 = low · 1 = high</span>
+              </label>
+              <input type="number" class="form-input" id="sector_risk_index"
+                placeholder="0.00 – 1.00" min="0" max="1" step="0.01"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group full">
+              <label class="form-label">Profile Completeness Score
+                <span class="field-hint">0 = sparse · 1 = fully filled</span>
+              </label>
+              <input type="number" class="form-input" id="profile_completeness_score"
+                placeholder="0.00 – 1.00" min="0" max="1" step="0.01"/>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-outline" onclick="clearForm()">Clear</button>
+            <button type="submit" class="btn-primary" id="submitBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Score Business
+            </button>
+          </div>
+        </form>
+      </div><!-- /form-panel -->
+
+      <!-- RESULT PANEL -->
+      <div class="result-panel">
+
+        <div class="result-empty card" id="resultEmpty">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <p class="empty-title">No results yet</p>
+          <p class="empty-sub">Submit a business profile on the left to view the risk assessment</p>
+        </div>
+
+        <div id="scoreResult" class="hidden">
+
+          <!-- Overview -->
+          <div class="card">
+            <div class="result-header">
+              <div>
+                <div class="result-business-id" id="res_business_id">—</div>
+                <div class="result-timestamp" id="res_timestamp"></div>
+              </div>
+              <div class="result-mv-pill" id="res_model_pill">v—</div>
+            </div>
+
+            <div class="score-row">
+              <div class="score-gauge-wrap">
+                <svg class="score-gauge" viewBox="0 0 120 72" width="155" height="92">
+                  <path d="M10,66 A55,55 0 0,1 110,66" fill="none" stroke="#E2E8F0" stroke-width="10" stroke-linecap="round"/>
+                  <path id="gaugeArc" d="M10,66 A55,55 0 0,1 110,66"
+                        fill="none" stroke="#2563EB" stroke-width="10"
+                        stroke-linecap="round"
+                        stroke-dasharray="173" stroke-dashoffset="173"/>
+                  <text id="gaugeScore" x="60" y="63" text-anchor="middle"
+                        font-family="'DM Mono', monospace"
+                        font-size="22" font-weight="700" fill="#1E293B">—</text>
+                </svg>
+                <div class="gauge-label">Risk Score / 100</div>
+              </div>
+
+              <div class="score-meta">
+                <div class="risk-band-badge" id="res_risk_band">—</div>
+
+                <div class="confidence-wrap">
+                  <span class="conf-label">Confidence</span>
+                  <div class="conf-bar-track">
+                    <div class="conf-bar-fill" id="res_confidence_bar"></div>
+                  </div>
+                  <span class="conf-value" id="res_confidence">—</span>
+                </div>
+
+                <div class="action-wrap">
+                  <span class="action-label">Recommendation</span>
+                  <div class="action-badge" id="res_action">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Factors -->
+          <div class="card" style="margin-top:14px">
+            <div class="card-header">
+              <h3 class="card-title">Key Risk Factors</h3>
+              <span class="badge-count" id="res_factors_count"></span>
+            </div>
+            <div id="res_factors" class="factors-list"></div>
+          </div>
+
+          <!-- AI Analysis -->
+          <div class="card" style="margin-top:14px">
+            <div class="card-header">
+              <h3 class="card-title">AI Risk Analysis</h3>
+              <div class="ai-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                LLaMA · Groq
+              </div>
+            </div>
+            <p class="ai-text" id="res_ai_analysis"></p>
+          </div>
+
+        </div><!-- /scoreResult -->
+      </div><!-- /result-panel -->
+
+    </div><!-- /score-layout -->
+  </main>
+
+  <!-- ==================== PAGE: BATCH ==================== -->
+  <main class="page-content hidden" id="page-batch">
+    <div class="page-header">
+      <h1 class="page-title">Batch Scoring</h1>
+      <p class="page-subtitle">
+        Score up to 100 businesses via <code class="inline-code">POST /api/v1/score/batch</code>.
+        First 5 records get AI analysis; remainder receive a summary placeholder.
+      </p>
+    </div>
+
+    <div class="batch-layout">
+
+      <div class="card batch-input-card">
+        <div class="card-header">
+          <h2 class="card-title">Batch Input JSON</h2>
+          <button class="btn-ghost" onclick="fillBatchSample()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Load Sample
+          </button>
+        </div>
+        <label class="form-label" style="margin-bottom:6px">JSON Array of Business Objects (max 100)</label>
+        <textarea class="batch-textarea" id="batchInput" spellcheck="false"
+          placeholder='[ { "business_id": "BUS-001", ... } ]'></textarea>
+        <div class="form-actions" style="margin-top:14px">
+          <button class="btn-outline" onclick="document.getElementById('batchInput').value=''">Clear</button>
+          <button class="btn-primary" onclick="submitBatch()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Run Batch Scoring
+          </button>
+        </div>
+      </div>
+
+      <div class="card batch-result-card">
+        <div class="card-header">
+          <h2 class="card-title">Batch Results</h2>
+          <span id="batchTimeLabel" class="time-label hidden"></span>
+        </div>
+        <div id="batchResultEmpty" class="result-empty" style="border:none;padding:36px 0">
+          <div class="empty-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <p class="empty-title">No batch results</p>
+          <p class="empty-sub">Paste JSON and run batch scoring</p>
+        </div>
+        <div id="batchResultContent" class="hidden">
+          <div class="batch-summary" id="batchSummary"></div>
+          <div id="batchResultsList" class="batch-results-list"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==================== PAGE: RESULTS ==================== -->
+  <main class="page-content hidden" id="page-results">
+    <div class="page-header">
+      <h1 class="page-title">Results History</h1>
+      <p class="page-subtitle">All businesses scored in this session</p>
+    </div>
+    <div class="card">
+      <div id="historyEmpty" class="result-empty" style="border:none;padding:40px 0">
+        <div class="empty-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <p class="empty-title">No history yet</p>
+        <p class="empty-sub">Score businesses to build your session history</p>
+      </div>
+      <div id="historyTable" class="hidden" style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Business ID</th>
+              <th>Risk Score</th>
+              <th>Risk Band</th>
+              <th>Confidence</th>
+              <th>Recommendation</th>
+              <th>Model</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+</div><!-- /main-wrapper -->
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="loading-card">
+    <div class="loading-spinner"></div>
+    <p class="loading-text" id="loadingText">Analyzing...</p>
+  </div>
+</div>
+
+<!-- JS served via /static/ mount -->
+<script src="/static/js/app.js"></script>
+</body>
+</html>

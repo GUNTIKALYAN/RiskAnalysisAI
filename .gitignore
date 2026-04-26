@@ -13,3 +13,4 @@ models/
 venv/
 .env.*
 FeatureEngineering.txt
+documents/

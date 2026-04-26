@@ -20,7 +20,7 @@ MAX_AI_CALLS = 5
 TIMEOUT_SECONDS = 30
 
 
-@router.get("/api/v1/health",status_code=200)
+@router.get("/health",status_code=200)
 def health_check():
     return {
         "status": "healthy",
@@ -28,13 +28,13 @@ def health_check():
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
-@router.post("/api/v1/score", response_model=BusinessResponse)
+@router.post("/score", response_model=BusinessResponse)
 def score_business(data: BusinessInput):
     raw = data.model_dump()
     return process_single_business(raw)
 
 
-@router.post("/api/v1/score/batch", response_model=BatchResponse)
+@router.post("/score/batch", response_model=BatchResponse)
 def score_batch(request: BatchRequest):
 
     start_time = time.time()

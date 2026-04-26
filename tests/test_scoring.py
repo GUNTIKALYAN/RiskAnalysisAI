@@ -17,8 +17,8 @@ def base_input():
 def test_low_risk():
     data = base_input()
 
-    from app.services.feature_engineering import engineer_features
-    from app.services.scoring_service import calculate_score
+    from backend.app.services.feature_engineering import engineer_features
+    from backend.app.services.scoring_service import calculate_score
 
     features = engineer_features(data)
     score = calculate_score(features)
@@ -34,8 +34,8 @@ def test_high_risk():
         "blocklist_flag": True
     })
 
-    from app.services.feature_engineering import engineer_features
-    from app.services.scoring_service import calculate_score
+    from backend.app.services.feature_engineering import engineer_features
+    from backend.app.services.scoring_service import calculate_score
 
     features = engineer_features(data)
     score = calculate_score(features)
@@ -50,8 +50,8 @@ def test_medium_risk():
         "return_bounce_rate": 0.1
     })
 
-    from app.services.feature_engineering import engineer_features
-    from app.services.scoring_service import calculate_score
+    from backend.app.services.feature_engineering import engineer_features
+    from backend.app.services.scoring_service import calculate_score
 
     features = engineer_features(data)
     score = calculate_score(features)
