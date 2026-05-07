@@ -194,46 +194,5 @@
       "blocklist_flag_false": "~88% of businesses"
     },
     "outliers": "Some records have extreme values (e.g., 8 defaults, $250K overdue). Candidates should be aware and document handling."
-  },
-  "usage_instructions": {
-    "step_1": "Download this file (dataset-template.json)",
-    "step_2": "Parse the JSON into your data loader",
-    "step_3": "Check for schema compliance and missing data",
-    "step_4": "Engineer features (create new derived signals if helpful)",
-    "step_5": "Train or define your risk model",
-    "step_6": "Score each record and output risk_score + risk_band + top_factors + ai_analysis",
-    "step_7": "Validate against API contract (API-CONTRACT.md)",
-    "step_8": "Write tests and document assumptions",
-    "step_9": "Submit code + README + model card + sample outputs"
-  },
-  "expected_output_format": {
-    "note": "After scoring all 250 records, candidates should generate output like this for each business:",
-    "example": {
-      "business_id": "BUS-00001",
-      "risk_score": 28,
-      "risk_band": "Low",
-      "confidence": 0.91,
-      "top_factors": [
-        {
-          "factor": "Long business history (120 months) and track record",
-          "contribution": 0.40,
-          "direction": "positive"
-        },
-        {
-          "factor": "Consistent on-time tax filings (2.5 days avg delay)",
-          "contribution": 0.30,
-          "direction": "positive"
-        },
-        {
-          "factor": "Strong turnover band ($10M-$100M annual)",
-          "contribution": 0.25,
-          "direction": "positive"
-        }
-      ],
-      "ai_risk_analysis": "This business presents low risk. It has a strong 10-year track record with large annual revenues ($10M-$100M) and excellent compliance history (minimal filing delays, no defaults, no legal notices). The organization is not on any blocklist and maintains high profile completeness (95%). Geographic and sector risks are moderate but well-managed by the company's maturity and scale. Recommend approval with standard KYC verification.",
-      "recommended_action": "Approve",
-      "timestamp": "2026-03-30T15:00:00Z",
-      "model_version": "1.0.0"
-    }
   }
 }

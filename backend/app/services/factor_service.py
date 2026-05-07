@@ -29,20 +29,59 @@ factor_map = {
 }
 
 
-def get_top_factors(d, weights):
-    factors = []
+# def get_top_factors(d, weights):
+#     factors = []
 
+#     for k, w in weights.items():
+#         value = d.get(k, 0)
+
+#         if value != 0:
+#             contribution = abs(value * w)
+
+#             if contribution >= 5:  # filter noise
+#                 factors.append({
+#                     "factor": factor_map.get(k, k),
+#                     "contribution": contribution,
+#                     "direction": "negative" if w > 0 else "positive"
+#                 })
+
+#     return sorted(factors, key=lambda x: x["contribution"], reverse=True)[:4]
+
+def get_top_factors(d, weights):
+    contributions = []
+
+    # 🔹 Step 1: compute raw contributions
     for k, w in weights.items():
         value = d.get(k, 0)
 
         if value != 0:
-            contribution = abs(value * w)
+            raw_contribution = abs(value * w)
 
-            if contribution >= 5:  # filter noise
-                factors.append({
-                    "factor": factor_map.get(k, k),
-                    "contribution": contribution,
-                    "direction": "negative" if w > 0 else "positive"
-                })
+            contributions.append({
+                "feature": k,
+                "factor": factor_map.get(k, k),
+                "raw_contribution": raw_contribution,
+                "direction": "negative" if w > 0 else "positive"
+            })
 
-    return sorted(factors, key=lambda x: x["contribution"], reverse=True)[:4]
+    # 🔹 Step 2: handle empty case
+    if not contributions:
+        return []
+
+    # 🔹 Step 3: normalize
+    total = sum(c["raw_contribution"] for c in contributions)
+
+    for c in contributions:
+        c["contribution"] = round(c["raw_contribution"] / total, 4)  # 0–1 scale
+
+    # 🔹 Step 4: filter noise AFTER normalization
+    contributions = [c for c in contributions if c["contribution"] >= 0.05]  # ≥5%
+
+    # 🔹 Step 5: sort & take top 4
+    contributions = sorted(contributions, key=lambda x: x["contribution"], reverse=True)[:4]
+
+    # 🔹 Step 6: remove raw field (clean output)
+    for c in contributions:
+        del c["raw_contribution"]
+
+    return contributions

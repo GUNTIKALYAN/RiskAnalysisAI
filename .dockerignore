@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.git
+.gitignore
+.vscode
+notebooks/
+tests/
+data/
+documents/
+*.ipynb
+FeatureEngineering.txt

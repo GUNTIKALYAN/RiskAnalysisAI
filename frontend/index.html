@@ -88,8 +88,7 @@
     <div class="page-header">
       <h1 class="page-title">Score Business</h1>
       <p class="page-subtitle">
-        Submit a business profile to <code class="inline-code">POST /api/v1/score</code>
-        and receive an AI-driven risk assessment.
+        Submit a business profile to receive an AI-driven risk assessment.
       </p>
     </div>
 
@@ -175,8 +174,8 @@
                 <span class="field-hint">required boolean</span>
               </label>
               <select class="form-input" id="blocklist_flag">
-                <option value="false">No — Not on blocklist</option>
-                <option value="true">Yes — On regulatory blocklist</option>
+                <option value="false">No - Not on blocklist</option>
+                <option value="true">Yes - On regulatory blocklist</option>
               </select>
             </div>
           </div>
@@ -196,7 +195,7 @@
             <div class="form-group">
               <label class="form-label">Annual Turnover Band</label>
               <select class="form-input" id="annual_turnover_band">
-                <option value="">— Select —</option>
+                <option value="">Select</option>
                 <option value="<1M">&lt; 1M</option>
                 <option value="1M-10M">1M – 10M</option>
                 <option value="10M-100M">10M – 100M</option>
@@ -215,14 +214,14 @@
                 <span class="field-hint">0 = low · 1 = high</span>
               </label>
               <input type="number" class="form-input" id="geography_risk_index"
-                placeholder="0.00 – 1.00" min="0" max="1" step="0.01"/>
+                placeholder="0.00 - 1.00" min="0" max="1" step="0.01"/>
             </div>
             <div class="form-group">
               <label class="form-label">Sector Risk Index
                 <span class="field-hint">0 = low · 1 = high</span>
               </label>
               <input type="number" class="form-input" id="sector_risk_index"
-                placeholder="0.00 – 1.00" min="0" max="1" step="0.01"/>
+                placeholder="0.00 - 1.00" min="0" max="1" step="0.01"/>
             </div>
           </div>
           <div class="form-row">
@@ -231,7 +230,7 @@
                 <span class="field-hint">0 = sparse · 1 = fully filled</span>
               </label>
               <input type="number" class="form-input" id="profile_completeness_score"
-                placeholder="0.00 – 1.00" min="0" max="1" step="0.01"/>
+                placeholder="0.00 - 1.00" min="0" max="1" step="0.01"/>
             </div>
           </div>
 
@@ -334,8 +333,7 @@
     <div class="page-header">
       <h1 class="page-title">Batch Scoring</h1>
       <p class="page-subtitle">
-        Score up to 100 businesses via <code class="inline-code">POST /api/v1/score/batch</code>.
-        First 5 records get AI analysis; remainder receive a summary placeholder.
+        Score up to 100 businesses. First 5 records get AI analysis; remainder receive a summary placeholder.
       </p>
     </div>
 
@@ -386,6 +384,9 @@
   <main class="page-content hidden" id="page-results">
     <div class="page-header">
       <h1 class="page-title">Results History</h1>
+      <button class="btn-outline" onclick="clearHistory()" style="margin-top:10px;">
+        Clear History
+      </button>
       <p class="page-subtitle">All businesses scored in this session</p>
     </div>
     <div class="card">

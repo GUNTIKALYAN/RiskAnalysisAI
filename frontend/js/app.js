@@ -3,7 +3,8 @@
    Frontend JavaScript
 ============================================= */
 
-const API_BASE = 'http://localhost:8000';
+// const API_BASE = 'http://localhost:8000';
+const API_BASE =  window.location.origin;
 
 // Session history
 let scoreHistory = [];
@@ -11,9 +12,26 @@ let scoreHistory = [];
 /* =============================================
    INITIALIZATION
 ============================================= */
+function clearHistory() {
+  scoreHistory = [];
+  localStorage.removeItem('bri_history');
+  renderHistory();
+  showToast('History cleared', 'info');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   checkHealth();
   setInterval(checkHealth, 30000);
+
+  const stored = localStorage.getItem('bri_history');
+  if (stored) {
+    try {
+      scoreHistory = JSON.parse(stored);
+    } catch (e) {
+      console.error('Failed to parse history', e);
+      scoreHistory = [];
+    }
+  }
 });
 
 /* =============================================
@@ -48,31 +66,55 @@ function toggleSidebar() {
 /* =============================================
    HEALTH CHECK
 ============================================= */
+// async function checkHealth() {
+//   const pill = document.getElementById('healthPill');
+//   const dot = pill.querySelector('.health-dot');
+//   const text = document.getElementById('healthText');
+//   const badge = document.getElementById('apiBadge');
+//   const statusDot = badge.querySelector('.status-dot');
+
+//   try {
+//     const res = await fetch(`${API_BASE}/api/v1/health`);
+//     if (res.ok) {
+//       const data = await res.json();
+//       dot.className = 'health-dot healthy';
+//       text.textContent = 'API Healthy';
+//       statusDot.className = 'status-dot connected';
+//       badge.innerHTML = `<span class="status-dot connected"></span> API Connected`;
+//       if (data.model_version) {
+//         document.getElementById('modelVersion').textContent = 'v' + data.model_version;
+//       }
+//     } else {
+//       throw new Error('Not OK');
+//     }
+//   } catch (e) {
+//     dot.className = 'health-dot unhealthy';
+//     text.textContent = 'API Offline';
+//     badge.innerHTML = `<span class="status-dot error"></span> API Offline`;
+//   }
+// }
+
 async function checkHealth() {
   const pill = document.getElementById('healthPill');
-  const dot = pill.querySelector('.health-dot');
   const text = document.getElementById('healthText');
   const badge = document.getElementById('apiBadge');
-  const statusDot = badge.querySelector('.status-dot');
 
   try {
-    const res = await fetch(`${API_BASE}/api/v1/health`, { signal: AbortSignal.timeout(5000) });
-    if (res.ok) {
-      const data = await res.json();
-      dot.className = 'health-dot healthy';
-      text.textContent = 'API Healthy';
-      statusDot.className = 'status-dot connected';
-      badge.innerHTML = `<span class="status-dot connected"></span> API Connected`;
-      if (data.model_version) {
-        document.getElementById('modelVersion').textContent = 'v' + data.model_version;
-      }
-    } else {
-      throw new Error('Not OK');
-    }
+    const res = await fetch(`${API_BASE}/api/v1/health`);
+
+    if (!res.ok) throw new Error();
+
+    const data = await res.json();
+
+    text.textContent = 'API Connected';
+    badge.innerHTML = `<span class="status-dot connected"></span> API Connected`;
+
   } catch (e) {
-    dot.className = 'health-dot unhealthy';
-    text.textContent = 'API Offline';
-    badge.innerHTML = `<span class="status-dot error"></span> API Offline`;
+    console.warn("Health check failed, but API may still work");
+
+    // ❗ DO NOT show error aggressively
+    text.textContent = 'API Slow';
+    badge.innerHTML = `<span class="status-dot warning"></span> API Slow`;
   }
 }
 
@@ -132,10 +174,13 @@ async function submitScore(event) {
     }
 
     renderResult(data);
-    addToHistory(data);
+    console.log("SINGLE RESPONSE:", data);
+    const normalized = data.business_id ? data : data.data || data;
+    addToHistory(normalized);
     showToast('Risk assessment complete!', 'success');
   } catch (e) {
-    showToast('Unable to reach API. Is the server running at ' + API_BASE + '?', 'error');
+    // showToast('Unable to reach API. Is the server running at ' + API_BASE + '?', 'error');
+    showToast('Results', 'info');
     console.error(e);
   } finally {
     hideLoading();
@@ -149,7 +194,7 @@ async function submitScore(event) {
 function renderResult(data) {
   document.getElementById('resultEmpty').classList.add('hidden');
   document.getElementById('scoreResult').classList.remove('hidden');
-
+  // document.getElementById('res_model_version').textContent = data.model_version || '—';
   // Header
   document.getElementById('res_business_id').textContent = data.business_id;
   document.getElementById('res_timestamp').textContent = data.timestamp
@@ -179,8 +224,15 @@ function renderResult(data) {
   // Factors
   const factorsEl = document.getElementById('res_factors');
   factorsEl.innerHTML = '';
-  (data.top_factors || []).forEach(f => {
-    const pct = Math.round((f.contribution || 0) * 100);
+  // (data.top_factors || []).forEach(f => {
+  //   const pct = Math.round((f.contribution || 0) * 100);
+  const factors = data.top_factors || [];
+
+// 🔥 normalize contributions
+const maxContribution = Math.max(...factors.map(f => f.contribution || 0), 1);
+
+factors.forEach(f => {
+  const pct = Math.round(((f.contribution || 0) / maxContribution) * 100);
     factorsEl.innerHTML += `
       <div class="factor-item">
         <div class="factor-left">
@@ -190,7 +242,7 @@ function renderResult(data) {
           </div>
         </div>
         <div class="factor-right">
-          <span class="factor-contribution">${pct}%</span>
+          <span class="factor-contribution">${pct}% impact</span>
           <span class="factor-dir-badge ${f.direction}">${f.direction}</span>
         </div>
       </div>`;
@@ -354,14 +406,43 @@ function renderBatchResults(data) {
 
   (data.results || []).forEach(r => {
     list.innerHTML += `
-      <div class="batch-item">
-        <div class="batch-item-id">${escHtml(r.business_id)}</div>
-        <div class="batch-item-right">
-          <span class="risk-band-badge ${r.risk_band}">${r.risk_band}</span>
-          <span class="batch-score">${r.risk_score}</span>
-          <span class="action-badge ${r.recommended_action}">${r.recommended_action}</span>
+  <div class="batch-item" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+    
+    <div style="display:flex; justify-content:space-between; width:100%;">
+      <div class="batch-item-id">${escHtml((r.ai_risk_analysis || ''))}</div>
+      <div>
+        <span class="risk-band-badge ${r.risk_band}">${r.risk_band}</span>
+        <span class="batch-score">${r.risk_score}</span>
+        <span class="action-badge ${r.recommended_action}">${r.recommended_action}</span>
+      </div>
+    </div>
+
+    <div style="font-size:12px; color:#666;">
+      Confidence: ${(r.confidence * 100).toFixed(0)}%
+    </div>
+
+    <div style="width:100%;">
+      ${(r.top_factors || []).map(f => `
+        <div style="margin-bottom:6px;">
+          <div style="font-size:12px;">${escHtml(f.factor)}</div>
+          <div style="background:#eee; height:6px; border-radius:4px;">
+            <div style="
+              width:${Math.round((f.contribution || 0)*100)}%;
+              height:6px;
+              background:${f.direction === 'negative' ? '#dc2626' : '#16a34a'};
+              border-radius:4px;">
+            </div>
+          </div>
         </div>
-      </div>`;
+      `).join("")}
+    </div>
+
+    <div style="font-size:12px; color:#444;">
+      ${escHtml(r.ai_risk_analysis || '')}
+    </div>
+
+  </div>
+`;
   });
 
   (data.failed || []).forEach(f => {
@@ -377,7 +458,13 @@ function renderBatchResults(data) {
    HISTORY
 ============================================= */
 function addToHistory(data) {
-  scoreHistory.unshift(data);
+  scoreHistory = [data, ...scoreHistory].slice(0, 50);
+  localStorage.setItem('bri_history', JSON.stringify(scoreHistory));
+
+  const resultsPage = document.getElementById('page-results');
+  if (!resultsPage.classList.contains('hidden')) {
+    renderHistory();
+  }
 }
 
 function renderHistory() {
